@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediksi Kebutuhan Stiker Tera</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white">
+            <h2 class="mb-0">Prediksi Kebutuhan Stiker Tera</h2>
+        </div>
+        <div class="card-body">
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    <label for="tahun" class="form-label">Pilih Tahun Prediksi</label>
+                    <select name="tahun" id="tahun" class="form-select" required>
+                        <option value="" disabled {% if not form.tahun.value %}selected{% endif %}>-- Pilih Tahun --</option>
+                        {% for t in tahun_range %}
+                        <option value="{{ t }}" {% if form.tahun.value|stringformat:"s" == t|stringformat:"s" %}selected{% endif %}>{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="col-md-6 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100">Lakukan Prediksi</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if hasil %}
+    <div class="card mt-4 shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h4>📊 Hasil Prediksi Tahun {{ form.cleaned_data.tahun }}</h4>
+        </div>
+        <div class="card-body">
+            <p><strong>Total Prediksi Kebutuhan Stiker Tera:</strong> {{ hasil.total_prediksi_stiker_tera }}</p>
+            
+            {% if hasil.rincian %}
+            <div class="table-responsive mt-3">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>SPBU</th>
+                            <th>Tanggal Pengujian</th>
+                            <th>Jenis Layanan</th>
+                            <th>Nozzle</th>
+                            <th>Prediksi PU BBM</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in hasil.rincian %}
+                        <tr>
+                            <td>{{ item.spbu }}</td>
+                            <td>{{ item.tanggal_pengujian }}</td>
+                            <td>{{ item.jenis_layanan }}</td>
+                            <td>{{ item.nozzle }}</td>
+                            <td>
+                                {% if item.pu_bbm == 'Gagal diprediksi' %}
+                                    <span class="text-danger">{{ item.pu_bbm }}</span>
+                                {% else %}
+                                    {{ item.pu_bbm }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-warning mt-3">
+                Tidak ada data rincian untuk tahun yang dipilih.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+</body>
+</html>

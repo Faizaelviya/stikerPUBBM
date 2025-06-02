@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Decision Tree - PU BBM</title>
+    <style>
+        table {
+            width: 70%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #eee;
+        }
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Judul tabel pertama -->
+    <h2>Jumlah PU BBM Per Tahun Berdasarkan Jenis Layanan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tahun</th>
+                <th>PU BBM Tahunan</th>
+                <th>PU BBM Tambahan</th>
+                <th>Total PU BBM</th>
+                <th>Kategori PU BBM</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data_jenis %}
+            <tr>
+                <td>{{ item.tahun }}</td>
+                <td>{{ item.pu_bbm_tahunan }}</td>
+                <td>{{ item.pu_bbm_tambahan }}</td>
+                {% with total=item.pu_bbm_tahunan|add:item.pu_bbm_tambahan %}
+                <td>{{ total }}</td>
+                <td>
+                    {% if total <= 350 %}
+                        1
+                    {% elif total <= 400 %}
+                        2
+                    {% else %}
+                        3
+                    {% endif %}
+                </td>
+                {% endwith %}
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5">Tidak ada data</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Judul tabel kedua -->
+    <h2>Jumlah PU BBM Tambahan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tahun</th>
+                <th>Jumlah PU BBM Tambahan Dua Tahun Sebelum</th>
+                <th>Kategori PU BBM</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data_tambahan_x2 %}
+            <tr>
+                <td>{{ item.tahun }}</td>
+                <td>{{ item.jumlah_pu_bbm_tambahan_x2 }}</td>
+                <td>{{ item.kategori }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Tidak ada data</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Judul tabel ketiga -->
+    <h2>Jumlah PU BBM Tahunan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Tahun</th>
+                <th>Jumlah PU BBM Tahunan Dua Tahun Sebelum</th>
+                <th>Kategori PU BBM</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data_tahunan_x2 %}
+            <tr>
+                <td>{{ item.tahun }}</td>
+                <td>{{ item.jumlah_pu_bbm_tahunan_x2 }}</td>
+                <td>{{ item.kategori }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">Tidak ada data</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Entropy Awal -->
+    <h2>Entropy Awal</h2>
+    <p>{{ entropy_awal }}</p>
+
+    <!-- Tabel hasil split tambahan -->
+    <h2>Gain Ratio PU BBM Tambahan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Split Point</th>
+                <th>Information Gain</th>
+                <th>Split Information</th>
+                <th>Gain Ratio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in split_info_gain_tambahan %}
+            <tr>
+                <td>{{ item.split_point }}</td>
+                <td>{{ item.information_gain }}</td>
+                <td>{{ item.split_information | floatformat:3 }}</td>
+                <td>{{ item.gain_ratio | floatformat:3 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Tabel hasil split tahunan -->
+    <h2>Gain Ratio PU BBM Tahunan</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Split Point</th>
+                <th>Information Gain</th>
+                <th>Split Information</th>
+                <th>Gain Ratio</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in split_info_gain_tahunan %}
+            <tr>
+                <td>{{ item.split_point }}</td>
+                <td>{{ item.information_gain }}</td>
+                <td>{{ item.split_information | floatformat:3 }}</td>
+                <td>{{ item.gain_ratio | floatformat:3 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Best split tambahan -->
+    <h2>Split Point Terbaik - Tambahan</h2>
+    <ul>
+        <li>Split Point: {{ best_split_tambahan.split_point | floatformat:3 }}</li>
+        <li>Information Gain: {{ best_split_tambahan.information_gain | floatformat:3 }}</li>
+        <li>Split Information: {{ best_split_tambahan.split_information | floatformat:3 }}</li>
+        <li>Gain Ratio: {{ best_split_tambahan.gain_ratio | floatformat:3 }}</li>
+    </ul>
+
+    <!-- Best split tahunan -->
+    <h2>Split Point Terbaik - Tahunan</h2>
+    <ul>
+        <li>Split Point: {{ best_split_tahunan.split_point | floatformat:3 }}</li>
+        <li>Information Gain: {{ best_split_tahunan.information_gain | floatformat:3 }}</li>
+        <li>Split Information: {{ best_split_tahunan.split_information | floatformat:3 }}</li>
+        <li>Gain Ratio: {{ best_split_tahunan.gain_ratio | floatformat:3 }}</li>
+    </ul>
+
+    <!-- Entropy setelah filtering -->
+    <h2>Entropy Setelah Penyaringan</h2>
+    <p>{{ entropy_filtered | floatformat:3 }}</p>
+
+    <!-- Data yang sudah difilter tambahan -->
+    <h2>PU BBM Tambahan Setelah Penyaringan</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Tahun</th>
+                <th>Jumlah PU BBM Tambahan Dua Tahun Sebelum</th>
+                <th>Kategori</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in filtered_data_tambahan %}
+            <tr>
+                <td>{{ item.tahun }}</td>
+                <td>{{ item.jumlah_pu_bbm_tambahan_x2 }}</td>
+                <td>{{ item.kategori }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<!-- Split tambahan setelah filtering -->
+<h2>Gain Ratio PU BBM Tambahan Setelah Penyaringan</h2>
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Split Point</th>
+            <th>Information Gain</th>
+            <th>Split Information</th>
+            <th>Gain Ratio</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for split in split_info_gain_tambahan2 %}
+        <tr>
+            <td>{{ split.split_point }}</td>
+            <td>{{ split.information_gain|floatformat:3 }}</td>
+            <td>{{ split.split_information|floatformat:3 }}</td>
+            <td>{{ split.gain_ratio|floatformat:3 }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="4">Tidak ada data untuk ditampilkan</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<br>
+
+<!-- Best split tambahan setelah filtering -->
+<h2>Split Point Terbaik - Setelah Penyaringan</h2>
+<ul>
+    <li>Split Point: {{ best_split_tambahan2.split_point }}</li>
+    <li>Information Gain: {{ best_split_tambahan2.information_gain|floatformat:3 }}</li>
+    <li>Split Information: {{ best_split_tambahan2.split_information|floatformat:3 }}</li>
+    <li>Gain Ratio: {{ best_split_tambahan2.gain_ratio|floatformat:3 }}</li>
+</ul>

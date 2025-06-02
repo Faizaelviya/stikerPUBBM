@@ -1,0 +1,89 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tambah SPBU</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background-color: #f3f4f6;
+        }
+        form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+            margin: auto;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #1e40af;
+            color: white;
+            padding: 10px;
+            border: none;
+            margin-top: 10px;
+            width: 100%;
+            cursor: pointer;
+        }
+        .btn:disabled {
+            background-color: #9ca3af;
+        }
+        .warning {
+            color: red;
+            margin-top: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h2>Tambah SPBU Baru</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.nama_perusahaan.label_tag }}
+        {{ form.nama_perusahaan }}
+        <div id="warning" class="warning">SPBU sudah terdaftar!</div>
+        <button type="submit" id="submitBtn" class="btn">Tambah SPBU</button>
+    </form>
+
+    <script>
+        $(document).ready(function(){
+            let timeout = null;
+
+            $("input[name='nama_perusahaan']").on('input', function(){
+                clearTimeout(timeout);
+                let nama = $(this).val();
+
+                timeout = setTimeout(function(){
+                    if(nama.length > 2){
+                        $.ajax({
+                            url: "{% url 'cek_nama_spbu' %}",
+                            data: {
+                                'nama': nama
+                            },
+                            success: function(data){
+                                if(data.terdaftar){
+                                    $("#warning").show();
+                                    $("#submitBtn").prop('disabled', true);
+                                } else {
+                                    $("#warning").hide();
+                                    $("#submitBtn").prop('disabled', false);
+                                }
+                            }
+                        });
+                    } else {
+                        $("#warning").hide();
+                        $("#submitBtn").prop('disabled', false);
+                    }
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

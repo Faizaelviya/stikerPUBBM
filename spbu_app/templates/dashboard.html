@@ -1,0 +1,86 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Aplikasi Prediksi Kebutuhan Stiker Tera PU BBM</title>
+
+    <!-- Memuat Bootstrap CSS dari CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Gaya halaman dashboard -->
+    <style>
+        /* Logo transparan sebagai latar belakang */
+        body::before {
+            content: "";
+        background-image: url("{% static 'images/Logo Tangerang.png' %}"); 
+        background-size: 100px; 
+        background-repeat: no-repeat;
+        background-position: 20px 20px; 
+        opacity: 0.07;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        }
+
+        /* Warna latar halaman */
+        body {
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Container utama halaman -->
+<div class="container py-5">
+
+    <!-- Judul halaman -->
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">Aplikasi Prediksi Kebutuhan Stiker Tera PU BBM</h1>
+    </div>
+
+    <!-- Baris yang menampung seluruh fitur -->
+    <div class="row justify-content-center">
+
+        <!-- Fitur 1: Input Data Tera -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Input Data Tera SPBU</h5>
+                    <p class="card-text">Masukkan data tera ke dalam database.</p>
+                    <a href="{% url 'input_data' %}" class="btn btn-primary">Input Data</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fitur 2: Prediksi Kebutuhan -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Prediksi Kebutuhan Stiker Tahunan</h5>
+                    <p class="card-text">Lihat prediksi kebutuhan stiker PU BBM berdasarkan data.</p>
+                    <a href="{% url 'prediksi_stiker' %}" class="btn btn-success">Lihat Prediksi</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fitur 3: Koreksi Data Tera -->
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Koreksi Data Tera</h5>
+                    <p class="card-text">Lihat dan perbaiki data tera yang sudah tersimpan di dalam database.</p>
+                    <a href="{% url 'koreksi_data' %}" class="btn btn-warning">Koreksi Data</a>
+                </div>
+            </div>
+        </div>
+
+    </div> 
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Tambah SPBU</title>
+    <!-- Menghubungkan Tailwind CSS untuk styling halaman -->
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.0.3/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100">
+
+    <!-- Container utama untuk hasil tambah SPBU -->
+    <div class="max-w-md mx-auto p-6 bg-white shadow-md rounded-lg mt-10">
+        <!-- Judul halaman -->
+        <h2 class="text-2xl font-bold text-center mb-4">Hasil Tambah SPBU</h2>
+
+        <!-- Pesan hasil operasional -->
+        {% if success %}
+            <!-- Pesan sukses jika operasi berhasil -->
+            <div class="bg-green-200 text-green-800 p-4 rounded mb-4">
+                <p class="text-center">{{ message }}</p>
+            </div>
+        {% else %}
+            <!-- Pesan error jika operasi gagal -->
+            <div class="bg-red-200 text-red-800 p-4 rounded mb-4">
+                <p class="text-center">{{ message }}</p>
+            </div>
+        {% endif %}
+
+        <!-- Tombol kembali ke halaman input data SPBU -->
+        <div class="text-center mt-6">
+            <a href="{% url 'input_data' %}" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-700">
+                Kembali ke Form Input SPBU
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Input Data Tera SPBU</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Styling untuk tombol kembali */
+        .back-btn {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Styling untuk body halaman */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f2f4f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        /* Styling untuk container utama */
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styling untuk judul halaman */
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        /* Styling untuk label input */
+        label {
+            font-weight: 600;
+            margin-top: 20px;
+            display: block;
+            color: #444;
+        }
+
+        /* Styling untuk input dan select */
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        /* Styling khusus untuk input tipe tanggal */
+        input[type="date"] {
+            padding: 9px;
+        }
+
+        /* Styling untuk tombol simpan */
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+            border: none;
+            margin-top: 30px;
+            transition: background 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+
+        /* Styling untuk tombol tambah SPBU baru */
+        .add-spbu-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .add-spbu-btn:hover {
+            background-color: #0069d9;
+        }
+
+        /* Styling untuk modal (popup) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 99;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        /* Styling untuk konten dalam modal */
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 400px;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Styling untuk tombol close pada modal */
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* Styling untuk pesan error pada input */
+        .error-message {
+            color: red;
+            font-size: 13px;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Tombol Kembali ke Dashboard -->
+    <a href="{% url 'dashboard' %}" class="back-btn">← Kembali ke Dashboard</a>
+
+    <h2>Input Data Tera SPBU</h2>
+
+    <!-- Form untuk input data SPBU -->
+    <form method="POST" id="input-data-form">
+        {% csrf_token %}
+
+        <label for="id_spbu">Nama SPBU:</label>
+        {{ form.spbu }}
+        <button type="button" class="add-spbu-btn" onclick="openModal()">+ Tambah SPBU Baru</button>
+
+        <label for="id_nozzle">Jumlah Nozzle:</label>
+        <input type="text" name="nozzle" id="id_nozzle"
+               inputmode="numeric" pattern="[0-9]*" maxlength="3"
+               oninput="filterAngka(this)" required>
+        <span id="error-nozzle" class="error-message"></span>
+
+        <label for="id_pu_bbm">Jumlah PU BBM:</label>
+        <input type="text" name="pu_bbm" id="id_pu_bbm"
+               inputmode="numeric" pattern="[0-9]*" maxlength="3"
+               oninput="filterAngka(this)" required>
+        <span id="error-pu" class="error-message"></span>
+
+        <!-- Input untuk tanggal pengujian -->
+        <label for="id_tanggal_pengujian">Tanggal Pengujian:</label>
+        {{ form.tanggal_pengujian }}
+
+        <label for="id_jenis_layanan">Jenis Pelayanan:</label>
+        {{ form.jenis_layanan }}
+
+        <!-- Tombol untuk menyimpan data -->
+        <button type="submit" class="submit-btn">Simpan Data</button>
+    </form>
+</div>
+
+<!-- Modal untuk tambah SPBU baru -->
+<div class="modal" id="spbu-modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Tambah SPBU Baru</h3>
+        <form method="POST" action="{% url 'hasil_tambah' %}">
+            {% csrf_token %}
+            <label for="spbu">Nama SPBU:</label>
+            <input type="text" name="spbu" id="spbu" required>
+            <button type="submit" class="submit-btn" style="margin-top:20px;">Simpan SPBU</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk membuka modal tambah SPBU
+    function openModal() {
+        document.getElementById("spbu-modal").style.display = "block";
+    }
+
+    // Fungsi untuk menutup modal tambah SPBU
+    function closeModal() {
+        document.getElementById("spbu-modal").style.display = "none";
+    }
+
+    // Fungsi untuk memfilter input angka
+    function filterAngka(input) {
+        // Menghapus karakter yang bukan angka
+        input.value = input.value.replace(/\D/g, ''); 
+    }
+
+    // Fungsi untuk validasi input (Nozzle dan PU BBM)
+    function validateInput(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+
+        input.addEventListener('input', function () {
+            const value = input.value.trim();
+
+            if (value === '' || !/^\d+$/.test(value)) {
+                error.textContent = 'Isi dengan angka 1 sampai 100.';
+                return;
+            }
+
+            const numeric = Number(value);
+            if (numeric < 1 || numeric > 100) {
+                error.textContent = 'Nilai harus antara 1 dan 100.';
+                return;
+            }
+
+            error.textContent = ''; // Clear error message jika input valid
+        });
+    }
+
+    // Event listener untuk validasi saat form dimuat
+    document.addEventListener("DOMContentLoaded", function () {
+        validateInput('id_nozzle', 'error-nozzle');
+        validateInput('id_pu_bbm', 'error-pu');
+    });
+
+    // Validasi saat form disubmit
+    document.getElementById("input-data-form").addEventListener("submit", function (e) {
+        const nozzle = document.getElementById('id_nozzle').value.trim();
+        const pu = document.getElementById('id_pu_bbm').value.trim();
+        const errorNozzle = document.getElementById('error-nozzle');
+        const errorPu = document.getElementById('error-pu');
+
+        const tanggalPengujianInput = document.querySelector('input[name="tanggal_pengujian"]');
+        const tahunSekarang = new Date().getFullYear();
+        let isValid = true;
+
+        // Validasi Nozzle
+        if (!/^\d+$/.test(nozzle) || Number(nozzle) < 1 || Number(nozzle) > 100) {
+            errorNozzle.textContent = 'Isi dengan angka 1 sampai 100.';
+            isValid = false;
+        }
+
+        // Validasi PU BBM
+        if (!/^\d+$/.test(pu) || Number(pu) < 1 || Number(pu) > 100) {
+            errorPu.textContent = 'Isi dengan angka 1 sampai 100.';
+            isValid = false;
+        }
+
+        // Validasi tahun pengujian
+        if (tanggalPengujianInput) {
+            const tanggalValue = tanggalPengujianInput.value;
+            if (tanggalValue) {
+                const tahunInput = new Date(tanggalValue).getFullYear();
+                if (tahunInput > tahunSekarang) {
+                    alert('Tahun pengujian tidak boleh melebihi tahun berjalan.');
+                    isValid = false;
+                }
+            }
+        }
+
+        // Jika ada error, form tidak akan disubmit
+        if (!isValid) e.preventDefault();
+    });
+</script>
+
+</body>
+</html>

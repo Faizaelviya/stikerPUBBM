@@ -1,0 +1,15 @@
+<!-- templates/upload.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Excel</title>
+</head>
+<body>
+    <h2>Upload File Excel</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="file" name="excel_file" required>
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>

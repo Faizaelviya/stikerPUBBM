@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Data Tera</title>
+
+    <!-- Memuat Bootstrap CSS dari CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Gaya halaman formulir -->
+    <style>
+        body {
+            background-color: #f2f5f9;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 60px auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-title {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .btn-primary {
+            width: 100%;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 0.875em;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Container utama halaman -->
+<div class="container">
+    <div class="form-container">
+        <!-- Judul formulir -->
+        <h4 class="form-title">Edit Data Tera</h4>
+
+        <!-- Formulir edit data, menggunakan metode POST -->
+        <form id="edit-data-form" method="post">
+            {% csrf_token %} <!-- Token CSRF untuk keamanan formulir -->
+
+            <!-- Input tidak bisa diubah untuk menampilkan nama SPBU -->
+            <div class="mb-3">
+                <label class="form-label">SPBU</label>
+                <input type="text" class="form-control" value="{{ data.spbu.spbu }}" disabled>
+            </div>
+
+            <!-- Input tidak bisa diubah untuk menampilkan tanggal pengujian -->
+            <div class="mb-3">
+                <label class="form-label">Tanggal Pengujian</label>
+                <input type="text" class="form-control" value="{{ data.tanggal_pengujian|date:'d-m-Y' }}" disabled>
+            </div>
+
+            <!-- Input jumlah nozzle (harus berupa angka antara 1–100) -->
+            <div class="mb-3">
+                <label for="id_jumlah_nozzle" class="form-label">Jumlah Nozzle</label>
+                <input type="text"
+                       class="form-control"
+                       name="nozzle"
+                       id="id_jumlah_nozzle"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       maxlength="3"
+                       value="{{ data.nozzle }}"
+                       oninput="filterAngka(this)"
+                       required>
+                <span id="error-nozzle" class="error-message"></span>
+            </div>
+
+            <!-- Input jumlah PU BBM (harus berupa angka antara 1–100) -->
+            <div class="mb-3">
+                <label for="id_jumlah_pu_bbm" class="form-label">Jumlah PU BBM</label>
+                <input type="text"
+                       class="form-control"
+                       name="pu_bbm"
+                       id="id_jumlah_pu_bbm"
+                       inputmode="numeric"
+                       pattern="[0-9]*"
+                       maxlength="3"
+                       value="{{ data.pu_bbm }}"
+                       oninput="filterAngka(this)"
+                       required>
+                <span id="error-pu" class="error-message"></span>
+            </div>
+
+            <!-- Dropdown untuk memilih jenis layanan -->
+            <div class="mb-3">
+                <label for="jenis_layanan" class="form-label">Jenis Layanan</label>
+                <select class="form-select" id="jenis_layanan" name="jenis_layanan" required>
+                    {% for key, value in data.JENIS_LAYANAN_CHOICES %}
+                        <option value="{{ key }}" {% if data.jenis_layanan == key %}selected{% endif %}>{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Tombol untuk mengirim formulir -->
+            <button type="submit" class="btn btn-primary mt-3">Simpan Perubahan</button>
+        </form>
+
+        <!-- Tautan kembali ke halaman koreksi data -->
+        <div class="text-center mt-3">
+            <a href="{% url 'koreksi_data' %}" class="btn btn-link">← Kembali ke Koreksi Data</a>
+        </div>
+    </div>
+</div>
+
+<!-- Script JavaScript untuk validasi dan filter angka -->
+<script>
+    // Fungsi untuk menyaring input agar hanya angka yang bisa diketik
+    function filterAngka(input) {
+        input.value = input.value.replace(/\D/g, '');
+    }
+
+    // Fungsi validasi input agar nilai harus berupa angka positif antara 1 sampai 100
+    function validateInput(inputId, errorId) {
+        const input = document.getElementById(inputId);
+        const error = document.getElementById(errorId);
+
+        input.addEventListener('input', function () {
+            const value = input.value.trim();
+
+            if (value === '') {
+                error.textContent = 'Isi dengan angka positif dan maksimal 100.';
+                return;
+            }
+
+            if (!/^\d+$/.test(value)) {
+                error.textContent = 'Isi dengan angka positif dan maksimal 100.';
+                return;
+            }
+
+            const numeric = Number(value);
+            if (numeric > 100 || numeric < 1) {
+                error.textContent = 'Isi dengan angka antara 1 sampai 100.';
+                return;
+            }
+
+            error.textContent = '';
+        });
+    }
+
+    // Menjalankan validasi saat halaman dimuat
+    document.addEventListener("DOMContentLoaded", function () {
+        validateInput('id_jumlah_nozzle', 'error-nozzle');
+        validateInput('id_jumlah_pu_bbm', 'error-pu');
+    });
+
+    // Validasi akhir saat formulir dikirim
+    document.getElementById("edit-data-form").addEventListener("submit", function (e) {
+        const nozzle = document.getElementById('id_jumlah_nozzle').value.trim();
+        const pu = document.getElementById('id_jumlah_pu_bbm').value.trim();
+        const errorNozzle = document.getElementById('error-nozzle');
+        const errorPu = document.getElementById('error-pu');
+
+        let isValid = true;
+
+        if (!/^\d+$/.test(nozzle) || Number(nozzle) < 1 || Number(nozzle) > 100) {
+            errorNozzle.textContent = 'Isi dengan angka antara 1 sampai 100.';
+            isValid = false;
+        }
+
+        if (!/^\d+$/.test(pu) || Number(pu) < 1 || Number(pu) > 100) {
+            errorPu.textContent = 'Isi dengan angka antara 1 sampai 100.';
+            isValid = false;
+        }
+
+        if (!isValid) e.preventDefault();
+    });
+</script>
+
+<!-- Bootstrap JS untuk fitur interaktif seperti dropdown atau modal -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

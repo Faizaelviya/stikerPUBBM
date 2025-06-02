@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediksi Kebutuhan Stiker</title>
+    <!-- Menghubungkan font 'Inter' dari Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Styling untuk tombol kembali */
+        .back-btn {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        /* Efek hover untuk tombol kembali */
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        /* Styling untuk body halaman */
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 40px;
+        }
+
+        /* Styling untuk container utama */
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        /* Styling untuk judul halaman */
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 32px;
+        }
+
+        /* Styling untuk label form */
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #444;
+        }
+
+        /* Styling untuk dropdown (select) */
+        select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            box-sizing: border-box;
+        }
+
+        /* Styling untuk tombol prediksi */
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 24px;
+            border-radius: 10px;
+            border: none;
+            font-size: 15px;
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        /* Efek hover untuk tombol prediksi */
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Styling untuk box hasil prediksi */
+        .result-box {
+            margin-top: 30px;
+            background-color: #e6f7e6;
+            border: 1px solid #b2dfdb;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            color: #2e7d32;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Tombol Kembali -->
+    <a href="{% url 'dashboard' %}" class="back-btn">← Kembali ke Dashboard</a>
+
+    <!-- Judul Halaman -->
+    <h2>Prediksi Kebutuhan Stiker Tahunan</h2>
+
+    <!-- Form untuk memilih tahun dan mengirimkan permintaan prediksi -->
+    <form method="POST">
+        {% csrf_token %}
+        <label for="tahun">Pilih Tahun:</label>
+        <select name="tahun_terpilih" id="tahun" required>
+            <option value="">-- Pilih Tahun --</option>
+            <!-- Menampilkan opsi tahun berdasarkan tahun_range -->
+            {% for t in tahun_range %}
+                <option value="{{ t }}" {% if t == tahun_terpilih %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+        <!-- Tombol untuk submit form -->
+        <button type="submit">Prediksi</button>
+    </form>
+    
+    <!-- Menampilkan pesan error jika ada -->
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+    
+    <!-- Menampilkan hasil prediksi jika ada -->
+    {% if kebutuhan_stiker %}
+    <div class="result-box">
+        <h3>Hasil Prediksi untuk Tahun {{ tahun_terpilih }}</h3>
+        <p>Kebutuhan Stiker: {{ kebutuhan_stiker }} lembar</p>
+    </div>
+{% endif %}
+</div>
+
+</body>
+</html>

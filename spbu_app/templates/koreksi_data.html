@@ -1,0 +1,119 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <title>Koreksi Data Tera</title>
+    <!-- Menghubungkan Bootstrap CSS untuk styling halaman -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Styling untuk tombol kembali */
+        .back-btn {
+            display: inline-block;
+            background-color: #6c757d;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        /* Efek hover untuk tombol kembali */
+        .back-btn:hover {
+            background-color: #5a6268;
+        }
+
+        /* Mengatur background body halaman */
+        body {
+            background-color: #f9fafb;
+        }
+
+        /* Menyesuaikan posisi teks dalam tabel */
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        /* Margin untuk tabel responsif */
+        .table-responsive {
+            margin-top: 20px;
+        }
+
+        /* Menyesuaikan ukuran tombol */
+        .btn-sm {
+            font-size: 0.875rem;
+        }
+
+        /* Styling untuk form pencarian */
+        .search-form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="container py-5">
+    <!-- Judul halaman -->
+    <h2 class="text-center mb-4">Koreksi Data Tera</h2>
+
+    <!-- Tombol kembali ke dashboard -->
+    <a href="{% url 'dashboard' %}" class="back-btn">← Kembali ke Dashboard</a>
+
+    <!-- Form pencarian data -->
+    <form method="get" class="search-form">
+        <div class="input-group">
+            <!-- Input untuk pencarian berdasarkan nama SPBU -->
+            <input type="text" name="q" class="form-control" placeholder="Cari berdasarkan nama SPBU" value="{{ request.GET.q }}">
+            <button type="submit" class="btn btn-primary">Cari</button>
+        </div>
+    </form>
+
+    <!-- Tabel data hasil pencarian -->
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <!-- Header tabel -->
+            <thead class="table-dark">
+                <tr>
+                    <th>SPBU</th>
+                    <th>Tanggal Pengujian</th>
+                    <th>Jumlah Nozzle</th>
+                    <th>Jumlah PU BBM</th>
+                    <th>Jenis Layanan</th>
+                    <th>Waktu Perubahan</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if data %}
+                    <!-- Menampilkan baris data jika ada -->
+                    {% for row in data %}
+                        <tr>
+                            <!-- Menampilkan informasi untuk tiap kolom -->
+                            <td>{{ row.spbu.spbu|default:"-" }}</td>
+                            <td>{{ row.tanggal_pengujian|date:"d-m-Y" }}</td>
+                            <td>{{ row.nozzle|default:"-" }}</td>
+                            <td>{{ row.pu_bbm|default:"-" }}</td>
+                            <td>{{ row.jenis_layanan|default:"-" }}</td>
+                            <td>{{ row.timestamp|date:"d-m-Y H:i:s" }}</td>
+                            <td>
+                                <!-- Tombol untuk mengedit data -->
+                                <a href="{% url 'edit_data' row.id %}" class="btn btn-sm btn-warning">Edit</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <!-- Menampilkan pesan jika tidak ada data -->
+                    <tr>
+                        <td colspan="7" class="text-center">Tidak ada data ditemukan.</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Menghubungkan Bootstrap JS untuk fungsionalitas tambahan -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
